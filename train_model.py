@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
+
 from ml.data import process_data
 from ml.model import (
     compute_model_metrics,
@@ -11,18 +12,18 @@ from ml.model import (
     train_model,
 )
 
-# Set project and data paths
-project_path = "/home/acj71/Udacity/Deploying-a-Scalable-ML-Pipeline-with-FastAPI"
+# Set the project path
+project_path = r"\\wsl.localhost\Ubuntu\home\acj71\Udacity\Deploying-a-Scalable-ML-Pipeline-with-FastAPI"
 data_path = os.path.join(project_path, "data", "census.csv")
+print(f"Data Path: {data_path}")
 
-# Load the census.csv data
-print(f"Loading data from {data_path}")
+# Load the census data
 data = pd.read_csv(data_path)
 
-# Split the data into a train dataset and a test dataset
+# Split the provided data to have a train dataset and a test dataset
 train, test = train_test_split(data, test_size=0.20, random_state=42)
 
-# Define categorical features
+# DO NOT MODIFY
 cat_features = [
     "workclass",
     "education",
@@ -34,7 +35,7 @@ cat_features = [
     "native-country",
 ]
 
-# Process the data
+# Process the training data
 X_train, y_train, encoder, lb = process_data(
     train,
     categorical_features=cat_features,
@@ -42,50 +43,55 @@ X_train, y_train, encoder, lb = process_data(
     training=True
 )
 
+# Process the test data
 X_test, y_test, _, _ = process_data(
     test,
     categorical_features=cat_features,
     label="salary",
     training=False,
     encoder=encoder,
-    lb=lb,
+    lb=lb
 )
 
-# Train the model
-print("Training the model...")
+# Train the model on the training dataset
 model = train_model(X_train, y_train)
 
 # Save the model and the encoder
 model_path = os.path.join(project_path, "model", "model.pkl")
-encoder_path = os.path.join(project_path, "model", "encoder.pkl")
-print(f"Saving model to {model_path}")
 save_model(model, model_path)
-print(f"Saving encoder to {encoder_path}")
-save_model(encoder, encoder_path)
+print(f"Model saved to: {model_path}")
 
-# Load the model
-print(f"Loading model from {model_path}")
+encoder_path = os.path.join(project_path, "model", "encoder.pkl")
+save_model(encoder, encoder_path)
+print(f"Encoder saved to: {encoder_path}")
+
+# Load the model for inference
 model = load_model(model_path)
 
-# Run model inferences on the test dataset
-print("Running inferences on the test dataset...")
+# Run inferences on the test dataset
 preds = inference(model, X_test)
 
 # Calculate and print the metrics
-print("Calculating performance metrics...")
-p, r, fb = compute_model_metrics(y_test, preds)
-print(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}")
+precision, recall, fbeta = compute_model_metrics(y_test, preds)
+print(f"Precision: {precision:.4f} | Recall: {recall:.4f} | F1: {fbeta:.4f}")
 
 # Compute the performance on model slices
-print("Computing performance on model slices...")
 slice_output_path = os.path.join(project_path, "slice_output.txt")
 with open(slice_output_path, "w") as f:
     for col in cat_features:
-        for slicevalue in sorted(test[col].unique()):
-            count = test[test[col] == slicevalue].shape[0]
+        for slice_value in sorted(test[col].unique()):
+            count = test[test[col] == slice_value].shape[0]
             p, r, fb = performance_on_categorical_slice(
-                test, col, slicevalue, cat_features, "salary", encoder, lb, model
+                data=test,
+                column_name=col,
+                slice_value=slice_value,
+                categorical_features=cat_features,
+                label="salary",
+                encoder=encoder,
+                lb=lb,
+                model=model
             )
-            f.write(f"{col}: {slicevalue}, Count: {count:,}\n")
-            f.write(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}\n")
-print(f"Slice metrics saved to {slice_output_path}")
+            f.write(f"{col}: {slice_value}, Count: {count:,}\n")
+            f.write(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}\n\n")
+
+print(f"Slice performance saved to: {slice_output_path}")
