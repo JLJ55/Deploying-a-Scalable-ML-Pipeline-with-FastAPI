@@ -12,10 +12,12 @@ from ml.model import (
     train_model,
 )
 
-# Load the census.csv data
+# Define the project path
 project_path = "/home/acj71/Udacity/Deploying-a-Scalable-ML-Pipeline-with-FastAPI"
+
+# Load the census.csv data
 data_path = os.path.join(project_path, "data", "census.csv")
-print(data_path)
+print(f"Loading data from: {data_path}")
 data = pd.read_csv(data_path)
 
 # Split the provided data into train and test datasets
@@ -33,7 +35,7 @@ cat_features = [
     "native-country",
 ]
 
-# Use the process_data function provided to process the training data
+# Process the training data
 X_train, y_train, encoder, lb = process_data(
     X=train,
     categorical_features=cat_features,
@@ -41,7 +43,7 @@ X_train, y_train, encoder, lb = process_data(
     training=True
 )
 
-# Use the process_data function to process the test data
+# Process the test data
 X_test, y_test, _, _ = process_data(
     X=test,
     categorical_features=cat_features,
@@ -51,13 +53,12 @@ X_test, y_test, _, _ = process_data(
     lb=lb
 )
 
-# Train the model on the training dataset
+# Train the model
 model = train_model(X_train, y_train)
 
 # Save the model and the encoder
 model_path = os.path.join(project_path, "model", "model.pkl")
 save_model(model, model_path)
-
 encoder_path = os.path.join(project_path, "model", "encoder.pkl")
 save_model(encoder, encoder_path)
 
@@ -71,21 +72,20 @@ preds = inference(model, X_test)
 precision, recall, fbeta = compute_model_metrics(y_test, preds)
 print(f"Precision: {precision:.4f} | Recall: {recall:.4f} | F1: {fbeta:.4f}")
 
-# Compute the performance on model slices using the performance_on_categorical_slice function
-for col in cat_features:
-    for slice_value in sorted(test[col].unique()):
-        count = test[test[col] == slice_value].shape[0]
-        p, r, fb = performance_on_categorical_slice(
-            data=test,
-            column_name=col,
-            slice_value=slice_value,
-            categorical_features=cat_features,
-            label="salary",
-            encoder=encoder,
-            lb=lb,
-            model=model
-        )
-        with open("slice_output.txt", "a") as f:
-            print(f"{col}: {slice_value}, Count: {count:,}", file=f)
-            print(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}", file=f)
-
+# Compute the performance on model slices
+with open("slice_output.txt", "w") as f:
+    for col in cat_features:
+        for slice_value in sorted(test[col].unique()):
+            count = test[test[col] == slice_value].shape[0]
+            p, r, fb = performance_on_categorical_slice(
+                data=test,
+                column_name=col,
+                slice_value=slice_value,
+                categorical_features=cat_features,
+                label="salary",
+                encoder=encoder,
+                lb=lb,
+                model=model
+            )
+            f.write(f"{col}: {slice_value}, Count: {count:,}\n")
+            f.write(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}\n")
