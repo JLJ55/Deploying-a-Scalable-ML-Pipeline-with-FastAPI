@@ -13,7 +13,7 @@ from ml.model import (
 )
 
 # Define the project path
-project_path = "/home/acj71/Udacity/Deploying-a-Scalable-ML-Pipeline-with-FastAPI"
+project_path = "/home/acj71/Udacity/Deploying-a-Scalable-ML-Pipeline-with-FastAPI/data/census.csv"
 
 # Load the census.csv data
 data_path = os.path.join(project_path, "data", "census.csv")
