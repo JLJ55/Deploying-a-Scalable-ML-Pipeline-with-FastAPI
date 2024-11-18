@@ -37,7 +37,7 @@ cat_features = [
 
 # Process the training data
 X_train, y_train, encoder, lb = process_data(
-    X=train,  # Explicitly passing the train data as X
+    X=train,
     categorical_features=cat_features,
     label="salary",
     training=True
@@ -45,7 +45,7 @@ X_train, y_train, encoder, lb = process_data(
 
 # Process the test data
 X_test, y_test, _, _ = process_data(
-    X=test,  # Explicitly passing the test data as X
+    X=test,
     categorical_features=cat_features,
     label="salary",
     training=False,
@@ -73,7 +73,8 @@ precision, recall, fbeta = compute_model_metrics(y_test, preds)
 print(f"Precision: {precision:.4f} | Recall: {recall:.4f} | F1: {fbeta:.4f}")
 
 # Compute the performance on model slices
-with open("slice_output.txt", "w") as f:
+slice_output_path = os.path.join(project_path, "slice_output.txt")
+with open(slice_output_path, "w") as f:
     for col in cat_features:
         for slice_value in sorted(test[col].unique()):
             count = test[test[col] == slice_value].shape[0]
@@ -89,3 +90,5 @@ with open("slice_output.txt", "w") as f:
             )
             f.write(f"{col}: {slice_value}, Count: {count:,}\n")
             f.write(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}\n")
+
+print(f"Slice performance saved to {slice_output_path}")
