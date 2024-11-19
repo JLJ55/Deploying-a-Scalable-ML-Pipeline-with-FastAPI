@@ -13,7 +13,7 @@ from ml.model import (
 )
 
 # Define the project path
-project_path = "/home/acj71/Udacity/Deploying-a-Scalable-ML-Pipeline-with-FastAPI/data/"
+project_path = "/home/acj71/Udacity/Deploying-a-Scalable-ML-Pipeline-with-FastAPI"
 
 # Load the census.csv data
 data_path = os.path.join(project_path, "data", "census.csv")
@@ -37,7 +37,7 @@ cat_features = [
 
 # Process the training data
 X_train, y_train, encoder, lb = process_data(
-    X=train,  # Ensure the train dataset is passed
+    X=train,
     categorical_features=cat_features,
     label="salary",
     training=True
@@ -45,7 +45,7 @@ X_train, y_train, encoder, lb = process_data(
 
 # Process the test data
 X_test, y_test, _, _ = process_data(
-    X=test,  # Ensure the test dataset is passed
+    X=test,
     categorical_features=cat_features,
     label="salary",
     training=False,
@@ -91,10 +91,4 @@ with open(slice_output_path, "w") as f:
             f.write(f"{col}: {slice_value}, Count: {count:,}\n")
             f.write(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}\n")
 
-print(f"Slice performance saved to {slice_output_path}")
-
-
-            f.write(f"{col}: {slice_value}, Count: {count:,}\n")
-            f.write(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}\n")
-
-print(f"Slice performance saved to {slice_output_path}")
+print(f"Slice output saved to: {slice_output_path}")
