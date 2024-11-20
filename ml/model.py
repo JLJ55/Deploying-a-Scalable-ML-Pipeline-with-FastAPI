@@ -14,15 +14,14 @@ def train_model(X_train, y_train):
         Training data.
     y_train : np.array
         Labels.
+
     Returns
     -------
     model
         Trained machine learning model.
     """
-    # Train a Random Forest Classifier
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
-    model.fit(X_train, y_train)
-    return model
+    # TODO: implement the function
+    pass
 
 
 def compute_model_metrics(y, preds):
@@ -35,69 +34,62 @@ def compute_model_metrics(y, preds):
         Known labels, binarized.
     preds : np.array
         Predicted labels, binarized.
+
     Returns
     -------
     precision : float
     recall : float
     fbeta : float
     """
-    fbeta = fbeta_score(y, preds, beta=1, zero_division=1)
     precision = precision_score(y, preds, zero_division=1)
     recall = recall_score(y, preds, zero_division=1)
+    fbeta = fbeta_score(y, preds, beta=1, zero_division=1)
     return precision, recall, fbeta
 
 
 def inference(model, X):
-    """ Run model inferences and return the predictions.
+    """
+    Run model inferences and return the predictions.
 
     Inputs
     ------
-    model : RandomForestClassifier or similar
+    model : ???
         Trained machine learning model.
     X : np.array
         Data used for prediction.
+
     Returns
     -------
     preds : np.array
         Predictions from the model.
     """
-    return model.predict(X)
-
+    # TODO: implement the function
+    pass
 
 def save_model(model, path):
-    """ Serializes model to a file.
+    """
+    Serializes model to a file.
 
     Inputs
     ------
-    model : RandomForestClassifier or similar
+    model
         Trained machine learning model or OneHotEncoder.
     path : str
         Path to save pickle file.
     """
-    with open(path, "wb") as file:
-        pickle.dump(model, file)
-
+    # TODO: implement the function
+    pass
 
 def load_model(path):
-    """ Loads pickle file from `path` and returns it.
-
-    Inputs
-    ------
-    path : str
-        Path to the pickle file.
-    Returns
-    -------
-    model : object
-        Loaded model or object from the pickle file.
-    """
-    with open(path, "rb") as file:
-        return pickle.load(file)
+    """ Loads pickle file from `path` and returns it."""
+    # TODO: implement the function
+    pass
 
 
 def performance_on_categorical_slice(
     data, column_name, slice_value, categorical_features, label, encoder, lb, model
 ):
-    """ Computes the model metrics on a slice of the data specified by a column name and slice value.
+    """ Computes the model metrics on a slice of the data specified by a column name and
 
     Processes the data using one hot encoding for the categorical features and a
     label binarizer for the labels. This can be used in either training or
@@ -109,17 +101,18 @@ def performance_on_categorical_slice(
         Dataframe containing the features and label.
     column_name : str
         Column containing the sliced feature.
-    slice_value : str, int, float
+    slice_value : str, int, or float
         Value of the slice feature.
     categorical_features: list
-        List containing the names of the categorical features.
+        List containing the names of the categorical features (default=[])
     label : str
-        Name of the label column in `data`.
-    encoder : sklearn.preprocessing.OneHotEncoder
-        Trained sklearn OneHotEncoder.
-    lb : sklearn.preprocessing.LabelBinarizer
-        Trained sklearn LabelBinarizer.
-    model : RandomForestClassifier or similar
+        Name of the label column in `X`. If None, then an empty array will be returned
+        for y (default=None)
+    encoder : sklearn.preprocessing._encoders.OneHotEncoder
+        Trained sklearn OneHotEncoder, only used if training=False.
+    lb : sklearn.preprocessing._label.LabelBinarizer
+        Trained sklearn LabelBinarizer, only used if training=False.
+    model : ???
         Model used for the task.
 
     Returns
@@ -128,22 +121,12 @@ def performance_on_categorical_slice(
     recall : float
     fbeta : float
     """
-    # Filter data for the slice
-    slice_data = data[data[column_name] == slice_value]
-
-    # Process the sliced data
+    # TODO: implement the function
     X_slice, y_slice, _, _ = process_data(
-        X=slice_data,
-        categorical_features=categorical_features,
-        label=label,
-        training=False,
-        encoder=encoder,
-        lb=lb,
+        # your code here
+        # for input data, use data in column given as "column_name", with the slice_value 
+        # use training = False
     )
-
-    # Make predictions
-    preds = inference(model, X_slice)
-
-    # Compute metrics
+    preds = None # your code here to get prediction on X_slice using the inference function
     precision, recall, fbeta = compute_model_metrics(y_slice, preds)
     return precision, recall, fbeta
